@@ -1,9 +1,24 @@
 import time
+import subprocess as sp
+#Lets python launch external programs, same as if it was terminal.
 
 WORK_MINUTES = 25
 SHORT_BREAK = 5
 LONG_BREAK = 15
 SESSIONS = 4
+
+def notify(title, message):
+    try:
+        sp.run([
+            "notify-send",
+            "--urgency=normal",
+            "--icon=clock",
+            title,
+            message
+        ])
+    except FileNotFoundError:
+        print(f"[notify]{title}: {message}") #Fallback to terminal
+
 
 def countdown(minutes, label):
     total_seconds = minutes*60
@@ -11,7 +26,7 @@ def countdown(minutes, label):
     while(total_seconds>0):
         mins = total_seconds // 60
         secs = total_seconds % 60
-        display = f"{label} : {mins:02d} : {secs:02d}"
+        display = f"{label} : {mins:02f} : {secs:02f}"
         print(display, end="\r")
         time.sleep(1)
         total_seconds -= 1
@@ -19,11 +34,14 @@ def countdown(minutes, label):
     
 def run_session(session_num):
     print(f"\n-------- Pomodoro {session_num} of {SESSIONS} -----------")
+    notify("🍅Timer started!", f" Pomodoro {session_num} of {SESSIONS} starting.")
     countdown(WORK_MINUTES, "Work")
     
     if(session_num < SESSIONS):
+        notify("Short Break!", "5 Minutes to relax.")
         countdown(SHORT_BREAK, "Short Break")
     else:
+        notify("🎉 Long Break!", "15 Minutes to strech legs.")
         countdown(LONG_BREAK,"Long Break")
 
 def main():
@@ -32,6 +50,6 @@ def main():
     for i in range(1, SESSIONS+1):
         run_session(i)
     
-    print("All sessions completed!")
+    print("✅ All sessions completed!")
 
 main()        
