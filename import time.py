@@ -1,11 +1,32 @@
 import time
 import subprocess as sp
 #Lets python launch external programs, same as if it was terminal.
+import json
+import argparse 
+#Library for building CLI tools.
+from pathlib import Path
+#Replacement for string file path.
 
-WORK_MINUTES = 25
-SHORT_BREAK = 5
-LONG_BREAK = 15
-SESSIONS = 4
+CONFIG_FILE = Path.home() / ".pomo_config.json"
+#Build path to home directory
+
+DEFAULT_CONFIG = {
+    "work_minutes" : 25,
+    "short_break" : 5,
+    "long_break" : 15,
+    "sessions" : 4,
+}
+
+def load_config():
+    try:
+        with open(CONFIG_FILE) as f:
+            return {**DEFAULT_CONFIG, **json.load(f)}
+        #Dict merge trick, It starts with defaults, and only replaces the keys present in the json file.
+    except FileNotFoundError:
+        return DEFAULT_CONFIG.copy()
+    except json.JSONDecodeError:
+        print("Confi file is invalid, using defaults.")
+        return DEFAULT_CONFIG.copy()
 
 def notify(title, message):
     try:
