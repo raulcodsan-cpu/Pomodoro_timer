@@ -72,13 +72,17 @@ def show_stats():
         print("No sessions logged in yet.")
         return
     
+    today = datetime.now().strftime("%Y-%m-%d")
+    totals = {}  # date → {"sessions": N, "minutes": M}
+
+    # newline="" is added as a safety measure for Windows, that requires a parameter or else defaults to breakline.
     with open(LOG_FILE, newline="") as f:
         for row in csv.DictReader(f):
             d = row["date"]
             if d not in totals:
                 totals[d] = {"sessions": 0, "minutes" : 0}
             totals[d]["sessions"] += 1
-            totals[d]["minutes"] += int(row(["minutes"]))
+            totals[d]["minutes"] += int(row["minutes"])
     
     print("\n── Pomodoro stats ──────────────────")
     for date, data in sorted(totals.items())[-7:]:
